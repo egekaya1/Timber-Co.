@@ -7,6 +7,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -19,16 +21,23 @@ public class FirstScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private List<Tree> trees;
     private OrthographicCamera camera;
+    private int woodCount = 0;
+    private BitmapFont font;
+    private SpriteBatch batch;
 
     @Override
     public void show() {
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1280, 720);
+        camera.setToOrtho(false, 1920, 1080);
         shapeRenderer = new ShapeRenderer();
         trees = new ArrayList<>();
         trees.add(new Tree(new Position(300f, 300f)));
         trees.add(new Tree(new Position(200f, 400f)));
         trees.add(new Tree(new Position(250f, 500f)));
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        font.getData().setScale(2);
+        batch = new SpriteBatch();
 
     }
 
@@ -40,9 +49,11 @@ public class FirstScreen implements Screen {
     }
 
     private void draw() {
+        // camera
         ScreenUtils.clear(Color.BLACK);
         camera.update();
         shapeRenderer.setProjectionMatrix(camera.combined);
+        //trees
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.GREEN);
 
@@ -51,6 +62,12 @@ public class FirstScreen implements Screen {
         }
 
         shapeRenderer.end();
+
+        //text
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        font.draw(batch, "Wood: " + woodCount, 10, 1060);
+        batch.end();
     }
 
     private void handleInput() {
@@ -58,12 +75,15 @@ public class FirstScreen implements Screen {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(touchPos);
 
-            trees.removeIf(tree -> {
+            boolean removedTree = trees.removeIf(tree -> {
                 float dx = tree.getTreePos().getX() - touchPos.x;
                 float dy = tree.getTreePos().getY() - touchPos.y;
                 float distance = (float) Math.sqrt(dx * dx + dy * dy);
                 return distance < 35;
             });
+            if (removedTree) {
+                woodCount++;
+            }
         }
     }
 
@@ -97,5 +117,7 @@ public class FirstScreen implements Screen {
     public void dispose() {
         // Destroy screen's assets here.
         shapeRenderer.dispose();
+        font.dispose();
+        batch.dispose();
     }
 }
