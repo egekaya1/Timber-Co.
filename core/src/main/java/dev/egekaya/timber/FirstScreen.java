@@ -2,6 +2,7 @@ package dev.egekaya.timber;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -30,15 +31,22 @@ public class FirstScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1920, 1080);
         shapeRenderer = new ShapeRenderer();
-        trees = new ArrayList<>();
-        trees.add(new Tree(new Position(300f, 300f)));
-        trees.add(new Tree(new Position(200f, 400f)));
-        trees.add(new Tree(new Position(250f, 500f)));
         font = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(2);
         batch = new SpriteBatch();
 
+        trees = new ArrayList<>();
+        spawnInitialTrees();
+    }
+
+    private void spawnInitialTrees() {
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            float x = random.nextFloat() * 1920;
+            float y = random.nextFloat() * 1080;
+            trees.add(new Tree(new Position(x, y)));
+        }
     }
 
     @Override
